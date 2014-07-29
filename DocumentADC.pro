@@ -11,10 +11,16 @@ TARGET = DocumentADC
 TEMPLATE = app
 
 SOURCES += main.cpp \
-           mainwindow.cpp
+           mainwindow.cpp \
+           image.cpp \
+           imageslist.cpp
 
-HEADERS += mainwindow.h
+HEADERS += mainwindow.h \
+           image.h \
+           imageslist.h
 
 OTHER_FILES += .gitignore \
                LICENSE \
                README.md
+
+CONFIG += c++11
