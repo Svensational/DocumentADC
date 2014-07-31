@@ -14,6 +14,8 @@ MainWindow::MainWindow(QWidget * parent) :
 {
    setWindowTitle(tr("Document ADC"));
 
+   imagesList = new ImagesList();
+
    createActions();
    createMenues();
    createListWidget();
@@ -33,6 +35,8 @@ void MainWindow::createActions() {
            this, &MainWindow::loadImages);
 
    clearAction = new QAction(tr("Clear list"), this);
+   connect(clearAction, &QAction::triggered,
+           imagesList, &ImagesList::clear);
 
    quitAction = new QAction(tr("&Quit"), this);
    quitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
@@ -44,7 +48,6 @@ void MainWindow::createListWidget() {
    listWidget = new QWidget();
    QVBoxLayout * mainLayout = new QVBoxLayout();
     imagesListView = new QListView();
-     imagesList = new ImagesList();
      imagesListView->setModel(imagesList);
     mainLayout->addWidget(imagesListView);
    listWidget->setLayout(mainLayout);
@@ -53,6 +56,7 @@ void MainWindow::createListWidget() {
 void MainWindow::createMenues() {
    QMenu * filesMenu = menuBar()->addMenu(tr("Files"));
    filesMenu->addAction(loadAction);
+   filesMenu->addAction(clearAction);
    filesMenu->addSeparator();
    filesMenu->addAction(quitAction);
 }
@@ -69,7 +73,7 @@ void MainWindow::loadImages() {
                                                      "Select one or more images to open",
                                                      QString(),
                                                      filter);
-   if (files.size() > 0) {
+   if (!files.isEmpty()) {
       imagesList->loadImages(files);
    }
 }

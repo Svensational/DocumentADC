@@ -17,6 +17,9 @@ public:
    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
    void loadImages(QStringList const & filenames);
 
+public slots:
+   void clear();
+
 private:
    QList<Image *> list;
 };

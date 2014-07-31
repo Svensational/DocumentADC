@@ -6,6 +6,16 @@ ImagesList::ImagesList(QObject * parent) :
 {
 }
 
+void ImagesList::clear() {
+   if (!list.isEmpty()) {
+      beginRemoveRows(QModelIndex(), 0, list.size()-1);
+      while (!list.isEmpty()) {
+         delete list.takeFirst();
+      }
+      endRemoveRows();
+   }
+}
+
 QVariant ImagesList::data(QModelIndex const & index, int role) const {
    if (index.row() >= 0 && index.row() < list.size()) {
       switch (role) {
@@ -53,7 +63,7 @@ void ImagesList::loadImages(QStringList const & filenames) {
       }
    }
 
-   if (newImages.size() > 0) {
+   if (!newImages.isEmpty()) {
       beginInsertRows(QModelIndex(), list.size(), list.size()+newImages.size()-1);
       list << newImages;
       endInsertRows();
