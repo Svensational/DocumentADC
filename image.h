@@ -9,7 +9,9 @@ class Image {
 
 public:
    Image(QString const & filename);
+   operator bool() const;
    QString const & getName() const;
+   bool isValid() const;
 
 private:
    QString name;

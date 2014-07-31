@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 
+class QListView;
+class ImagesList;
+
 class MainWindow : public QMainWindow {
 
    Q_OBJECT
@@ -12,13 +15,17 @@ public:
    ~MainWindow();
 
 private:
-   QAction * LoadAction;
-   QAction * ClearAction;
+   QAction * loadAction;
+   QAction * clearAction;
+   QAction * quitAction;
    QWidget * listWidget;
+   QListView * imagesListView;
+   ImagesList * imagesList;
 
    void createActions();
+   void createMenues();
    void createListWidget();
-   void createDockWidgets();
+   void loadImages();
 };
 
 #endif // MAINWINDOW_H

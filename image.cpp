@@ -10,3 +10,11 @@ Image::Image(QString const & filename) :
 QString const & Image::getName() const {
    return name;
 }
+
+bool Image::isValid() const {
+   return untouched && !untouched->isNull();
+}
+
+Image::operator bool() const {
+   return untouched && !untouched->isNull();
+}
