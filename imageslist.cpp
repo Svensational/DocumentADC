@@ -21,6 +21,10 @@ QVariant ImagesList::data(QModelIndex const & index, int role) const {
       switch (role) {
          case Qt::DisplayRole:
             return list.at(index.row())->getName();
+         case Qt::EditRole:
+            return list.at(index.row())->getName();
+         case Qt::CheckStateRole:
+            return list.at(index.row())->getChecked();
          default:
             return QVariant();
       }
@@ -32,7 +36,7 @@ QVariant ImagesList::data(QModelIndex const & index, int role) const {
 
 Qt::ItemFlags ImagesList::flags (QModelIndex const & index) const {
    if (index.isValid()) {
-      return Qt::ItemIsSelectable /*| Qt::ItemIsEditable | Qt::ItemIsUserCheckable*/ | Qt::ItemIsEnabled;
+      return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
    }
    else {
       return Qt::ItemIsEnabled;
@@ -76,5 +80,25 @@ int ImagesList::rowCount (QModelIndex const & parent) const {
    }
    else {
       return list.size();
+   }
+}
+
+bool ImagesList::setData(QModelIndex const & index, QVariant const & value, int role) {
+   if (index.row() >= 0 && index.row() < list.size()) {
+      switch (role) {
+         case Qt::EditRole:
+            list.at(index.row())->setName(value.toString());
+            emit dataChanged(index, index);
+            return true;
+         case Qt::CheckStateRole:
+            list.at(index.row())->setChecked(static_cast<Qt::CheckState>(value.toInt()));
+            emit dataChanged(index, index);
+            return true;
+         default:
+            return false;
+      }
+   }
+   else {
+      return false;
    }
 }

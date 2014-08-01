@@ -13,6 +13,16 @@ Image::~Image() {
    delete touched;
 }
 
+void Image::ensureTouchedExistence() {
+   if (!touched) {
+      touched = new QImage(*untouched);
+   }
+}
+
+Qt::CheckState Image::getChecked() const {
+   return checked;
+}
+
 QString const & Image::getName() const {
    return name;
 }
@@ -23,4 +33,12 @@ bool Image::isValid() const {
 
 Image::operator bool() const {
    return untouched && !untouched->isNull();
+}
+
+void Image::setChecked(Qt::CheckState checkState) {
+   checked = checkState;
+}
+
+void Image::setName(QString const & newName) {
+   name = newName;
 }

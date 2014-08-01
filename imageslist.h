@@ -15,6 +15,7 @@ public:
    Qt::ItemFlags flags(QModelIndex const & index) const;
    QVariant data(QModelIndex const & index, int role) const;
    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+   bool setData(QModelIndex const & index, QVariant const & value, int role = Qt::EditRole);
    void loadImages(QStringList const & filenames);
 
 public slots:
