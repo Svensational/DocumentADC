@@ -17,7 +17,12 @@ public:
    void setChecked(Qt::CheckState checkState);
    void setName(QString const & newName);
 
+   void clear();
+   void convertToGrayscale();
+   void save();
+
 private:
+   bool grayscale;
    Qt::CheckState checked;
    QString name;
    QImage * untouched;
