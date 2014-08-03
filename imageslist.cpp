@@ -1,4 +1,5 @@
 #include "imageslist.h"
+#include <QTime>
 #include "image.h"
 
 ImagesList::ImagesList(QObject * parent) :
@@ -81,6 +82,21 @@ int ImagesList::rowCount (QModelIndex const & parent) const {
    else {
       return list.size();
    }
+}
+
+void ImagesList::run() {
+   QTime t;
+   t.start();
+
+   foreach (Image * image, list) {
+      if (image->getChecked()) {
+         image->clear();
+         // convert to grayscale
+         image->convertToGrayscale();
+      }
+   }
+
+   qDebug("Time elapsed: %d ms", t.elapsed());
 }
 
 bool ImagesList::setData(QModelIndex const & index, QVariant const & value, int role) {

@@ -7,6 +7,13 @@ class QImage;
 
 class Image {
 
+   struct ScanLine {
+     uchar const * in;
+     uchar * out;
+     int width;
+     ScanLine(uchar const * in, uchar * out, int width);
+   };
+
 public:
    Image(QString const & filename);
    ~Image();
@@ -29,6 +36,7 @@ private:
    QImage * touched;
 
    void ensureTouchedExistence();
+   static void convertToGrayscaleMT(ScanLine & scanLine);
 };
 
 #endif // IMAGE_H

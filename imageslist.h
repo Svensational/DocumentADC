@@ -20,6 +20,7 @@ public:
 
 public slots:
    void clear();
+   void run();
 
 private:
    QList<Image *> list;

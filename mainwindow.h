@@ -17,6 +17,7 @@ public:
 private:
    QAction * loadAction;
    QAction * clearAction;
+   QAction * runAction;
    QAction * quitAction;
    QWidget * listWidget;
    QListView * imagesListView;

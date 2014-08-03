@@ -38,6 +38,10 @@ void MainWindow::createActions() {
    connect(clearAction, &QAction::triggered,
            imagesList, &ImagesList::clear);
 
+   runAction = new QAction(tr("&Run"), this);
+   connect(runAction, &QAction::triggered,
+           imagesList, &ImagesList::run);
+
    quitAction = new QAction(tr("&Quit"), this);
    quitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
    connect(quitAction, &QAction::triggered,
@@ -57,6 +61,8 @@ void MainWindow::createMenues() {
    QMenu * filesMenu = menuBar()->addMenu(tr("Files"));
    filesMenu->addAction(loadAction);
    filesMenu->addAction(clearAction);
+   filesMenu->addSeparator();
+   filesMenu->addAction(runAction);
    filesMenu->addSeparator();
    filesMenu->addAction(quitAction);
 }

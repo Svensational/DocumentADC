@@ -1,4 +1,5 @@
 #include "image.h"
+#include <QtConcurrent>
 #include <QImage>
 
 Image::Image(QString const & filename) :
@@ -6,10 +7,6 @@ Image::Image(QString const & filename) :
    name(filename.mid(filename.lastIndexOf('/')+1, filename.lastIndexOf('.')-filename.lastIndexOf('/')-1)),
    untouched(new QImage(filename)), touched(nullptr)
 {
-   grayscale = untouched->isGrayscale() && untouched->format() == QImage::Format_Indexed8;
-   // just for testing purpose
-   convertToGrayscale();
-   save();
 }
 
 Image::~Image() {
@@ -24,7 +21,6 @@ void Image::clear() {
 
 void Image::convertToGrayscale() {
    ensureTouchedExistence();
-
    if (grayscale) return;
 
    QImage * result = new QImage(touched->size(), QImage::Format_Indexed8);
@@ -33,24 +29,30 @@ void Image::convertToGrayscale() {
       result->setColor(i, qRgb(i, i, i));
    }
 
-   QRgb const * currentLineIn;
-   uchar * currentLineOut;
+   QList<ScanLine> lineList;
    for (int y=0; y<touched->height(); ++y) {
-      currentLineIn = reinterpret_cast<QRgb const *>(touched->constScanLine(y));
-      currentLineOut = result->scanLine(y);
-      for (int x=0; x<touched->width(); ++x) {
-         currentLineOut[x] = qGray(currentLineIn[x]);
-      }
+      lineList << ScanLine(touched->constScanLine(y),
+                           result->scanLine(y),
+                           touched->width());
    }
+   QtConcurrent::blockingMap(lineList, convertToGrayscaleMT);
 
    delete touched;
    touched = result;
    grayscale = true;
 }
 
+void Image::convertToGrayscaleMT(Image::ScanLine & scanLine) {
+   QRgb const * in = reinterpret_cast<QRgb const *>(scanLine.in);
+   for (int x=0; x<scanLine.width; ++x) {
+      scanLine.out[x] = qGray(in[x]);
+   }
+}
+
 void Image::ensureTouchedExistence() {
    if (!touched) {
       touched = new QImage(*untouched);
+      grayscale = touched->format()==QImage::Format_Indexed8 && touched->isGrayscale();
    }
 }
 
@@ -82,4 +84,11 @@ void Image::setChecked(Qt::CheckState checkState) {
 
 void Image::setName(QString const & newName) {
    name = newName;
+}
+
+
+
+Image::ScanLine::ScanLine(uchar const * in, uchar * out, int width) :
+   in(in), out(out), width(width)
+{
 }
