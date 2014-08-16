@@ -1,6 +1,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <QPair>
 #include <QString>
 
 class QImage;
@@ -10,8 +11,8 @@ class Image {
    struct ScanLine {
      uchar const * in;
      uchar * out;
-     int width;
-     ScanLine(uchar const * in, uchar * out, int width);
+     uint width;
+     ScanLine(uchar const * in, uchar * out, uint width);
    };
 
 public:
@@ -26,7 +27,8 @@ public:
 
    void clear();
    void convertToGrayscale();
-   void save();
+   void removeBackground(int kernelSize);
+   void save(); ///< @todo add folder and format
 
 private:
    bool grayscale;
@@ -37,6 +39,8 @@ private:
 
    void ensureTouchedExistence();
    static void convertToGrayscaleMT(ScanLine & scanLine);
+   static void removeBackgroundGray1MT(QPair<ScanLine, int> & data);
+   static void removeBackgroundGray2MT(QPair<ScanLine, QPair<ushort, ushort>> & data);
 };
 
 #endif // IMAGE_H

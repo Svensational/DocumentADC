@@ -91,8 +91,9 @@ void ImagesList::run() {
    foreach (Image * image, list) {
       if (image->getChecked()) {
          image->clear();
-         // convert to grayscale
          image->convertToGrayscale();
+         image->removeBackground(3);
+         image->save();
       }
    }
 

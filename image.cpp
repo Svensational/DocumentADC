@@ -44,7 +44,7 @@ void Image::convertToGrayscale() {
 
 void Image::convertToGrayscaleMT(Image::ScanLine & scanLine) {
    QRgb const * in = reinterpret_cast<QRgb const *>(scanLine.in);
-   for (int x=0; x<scanLine.width; ++x) {
+   for (uint x=0u; x<scanLine.width; ++x) {
       scanLine.out[x] = qGray(in[x]);
    }
 }
@@ -72,6 +72,92 @@ Image::operator bool() const {
    return untouched && !untouched->isNull();
 }
 
+void Image::removeBackground(int kernelSize) {
+   ensureTouchedExistence();
+
+   QImage * temp = new QImage(touched->size(), touched->format());
+   if (grayscale) {
+      temp->setColorCount(256);
+      for (int i=0; i<256; ++i) {
+         temp->setColor(i, qRgb(i, i, i));
+      }
+   }
+
+   // Pass 1
+   QList<QPair<ScanLine, int>> lineList1;
+   for (int y=0; y<touched->height(); ++y) {
+      lineList1 << QPair<ScanLine, int>(ScanLine(touched->constScanLine(y),
+                                                 temp->scanLine(y),
+                                                 touched->width()),
+                                        kernelSize);
+   }
+   if (grayscale) {
+      QtConcurrent::blockingMap(lineList1, removeBackgroundGray1MT);
+   }
+   lineList1.clear();
+
+   // Pass 2
+   QList<QPair<ScanLine, QPair<ushort, ushort>>> lineList2;
+   for (int x=0; x<touched->width(); ++x) {
+      lineList2 << QPair<ScanLine, QPair<ushort, ushort>>(ScanLine(temp->constScanLine(0)+x,
+                                                                   touched->scanLine(0)+x,
+                                                                   touched->width()),
+                                                          QPair<ushort, ushort>(kernelSize,
+                                                                                touched->height()));
+   }
+   if (grayscale) {
+      QtConcurrent::blockingMap(lineList2, removeBackgroundGray2MT);
+   }
+   lineList2.clear();
+   delete temp;
+}
+
+void Image::removeBackgroundGray1MT(QPair<ScanLine, int> & data) {
+   uchar max = 0u;
+   // half kernel size
+   const uint n = data.second << 1;
+   for (uint x=0u; x<data.first.width; ++x) {
+      // small optimization possible, but not sure if practical for typical kernel sizes
+      if (x<n+1u || data.first.in[x-n-1u]==max) {
+         // search whole neighborhood for max
+         max = 0u;
+         for (uint i=qMax(x-n, 0u); i<qMin(x+n+1u, data.first.width); ++i) {
+            max = qMax(max, data.first.in[i]);
+         }
+      }
+      else {
+         // just compare new pixel with last max
+         if (x+n < data.first.width) {
+            max = qMax(max, data.first.in[x+n]);
+         }
+      }
+      data.first.out[x] = max;
+   }
+}
+
+void Image::removeBackgroundGray2MT(QPair<ScanLine, QPair<ushort, ushort>> & data) {
+   uchar max = 0u;
+   // half kernel size
+   const ushort n = data.second.first << 1;
+   // bytes per line (data is aligned on a 32-bit boundary)
+   const ushort bpl = (data.first.width << 2) >> 2;
+   for (uint y=0u; y<data.second.second; ++y) {
+      if (y<n+1u || *(data.first.in+(y-n-1u)*bpl)==max) {
+         max = 0u;
+         for (uint i=qMax(y-n, 0u); i<qMin(y+n+1u, (uint)data.second.second); ++i) {
+            max = qMax(max, *(data.first.in+i*bpl));
+         }
+      }
+      else {
+         if (y+n < data.second.second) {
+            max = qMax(max, *(data.first.in+(y+n)*bpl));
+         }
+      }
+      // divide original data by the background value
+      *(data.first.out+y*bpl) /= max/255.0;
+   }
+}
+
 void Image::save() {
    ensureTouchedExistence();
 
@@ -88,7 +174,7 @@ void Image::setName(QString const & newName) {
 
 
 
-Image::ScanLine::ScanLine(uchar const * in, uchar * out, int width) :
+Image::ScanLine::ScanLine(uchar const * in, uchar * out, uint width) :
    in(in), out(out), width(width)
 {
 }
