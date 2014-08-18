@@ -28,6 +28,7 @@ public:
    void clear();
    void convertToGrayscale();
    void removeBackground(int kernelSize);
+   void windowing(int min, int max);
    void save(); ///< @todo add folder and format
 
 private:
@@ -41,6 +42,7 @@ private:
    static void convertToGrayscaleMT(ScanLine & scanLine);
    static void removeBackgroundGray1MT(QPair<ScanLine, int> & data);
    static void removeBackgroundGray2MT(QPair<ScanLine, QPair<ushort, ushort>> & data);
+   static void windowingGrayMT(QPair<ScanLine, QPair<float, float>> & data);
 };
 
 #endif // IMAGE_H

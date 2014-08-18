@@ -172,6 +172,33 @@ void Image::setName(QString const & newName) {
    name = newName;
 }
 
+void Image::windowing(int min, int max) {
+   ensureTouchedExistence();
+
+   const float a = 255.0/float(max-min);
+   const float b = -a*min;
+
+   QList<QPair<ScanLine, QPair<float, float>>> lineList;
+   for (int y=0; y<touched->height(); ++y) {
+      lineList << QPair<ScanLine, QPair<float, float>>(ScanLine(touched->constScanLine(y),
+                                                                touched->scanLine(y),
+                                                                touched->width()),
+                                                       QPair<float, float>(a, b));
+   }
+   if (grayscale) {
+      QtConcurrent::blockingMap(lineList, windowingGrayMT);
+   }
+   lineList.clear();
+}
+
+void Image::windowingGrayMT(QPair<ScanLine, QPair<float, float>> & data) {
+   for (uint x=0u; x<data.first.width; ++x) {
+      data.first.out[x] = uchar(qBound(0.0f,
+                                       data.second.first * data.first.in[x] + data.second.second + 0.5f,
+                                       255.0f));
+   }
+}
+
 
 
 Image::ScanLine::ScanLine(uchar const * in, uchar * out, uint width) :

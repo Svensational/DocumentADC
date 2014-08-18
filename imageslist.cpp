@@ -93,6 +93,7 @@ void ImagesList::run() {
          image->clear();
          image->convertToGrayscale();
          image->removeBackground(3);
+         image->windowing(32, 255-32);
          image->save();
       }
    }
