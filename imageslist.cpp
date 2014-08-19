@@ -1,4 +1,6 @@
 #include "imageslist.h"
+#include <QPainter>
+#include <QPdfWriter>
 #include <QTime>
 #include "image.h"
 
@@ -94,11 +96,41 @@ void ImagesList::run() {
          image->convertToGrayscale();
          image->removeBackground(3);
          image->windowing(32, 255-32);
-         image->save();
+         //image->save();
+      }
+   }
+   saveAsPDF();
+
+   qDebug("Time elapsed: %d ms", t.elapsed());
+}
+
+void ImagesList::saveAsPDF() {
+   QPdfWriter pdfWriter("test.pdf");
+   pdfWriter.setTitle("TestTitle");
+   pdfWriter.setCreator("DocumentADC");
+   pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+   pdfWriter.setPageMargins(QMarginsF(0.0, 0.0, 0.0, 0.0));
+   pdfWriter.setResolution(300);
+   QPainter painter;
+
+   bool first = true;
+   foreach (Image * image, list) {
+      if (image->getChecked()) {
+         pdfWriter.setPageOrientation(image->getOrientation());
+
+         if (first) {
+            painter.begin(&pdfWriter);
+            first = false;
+         }
+         else {
+            pdfWriter.newPage();
+         }
+
+         painter.drawImage(pdfWriter.pageLayout().fullRectPixels(300), image->getTouched());
       }
    }
 
-   qDebug("Time elapsed: %d ms", t.elapsed());
+   painter.end();
 }
 
 bool ImagesList::setData(QModelIndex const & index, QVariant const & value, int role) {

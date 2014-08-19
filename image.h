@@ -1,6 +1,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#include <QPageLayout>
 #include <QPair>
 #include <QString>
 
@@ -24,6 +25,8 @@ public:
    bool isValid() const;
    void setChecked(Qt::CheckState checkState);
    void setName(QString const & newName);
+   QImage const & getTouched();
+   QPageLayout::Orientation getOrientation();
 
    void clear();
    void convertToGrayscale();

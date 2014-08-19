@@ -64,6 +64,23 @@ QString const & Image::getName() const {
    return name;
 }
 
+QPageLayout::Orientation Image::getOrientation() {
+   ensureTouchedExistence();
+
+   if (touched->width() > touched->height()) {
+      return QPageLayout::Landscape;
+   }
+   else {
+      return QPageLayout::Portrait;
+   }
+}
+
+QImage const & Image::getTouched() {
+   ensureTouchedExistence();
+
+   return *touched;
+}
+
 bool Image::isValid() const {
    return untouched && !untouched->isNull();
 }
