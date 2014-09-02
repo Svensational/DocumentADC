@@ -32,7 +32,7 @@ public:
    void convertToGrayscale();
    void removeBackground(int kernelSize);
    void windowing(int min, int max);
-   void save(); ///< @todo add folder and format
+   void save(QString const & dir, QString const & suffix);
 
 private:
    bool grayscale;

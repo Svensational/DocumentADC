@@ -96,18 +96,24 @@ void ImagesList::run() {
          image->convertToGrayscale();
          image->removeBackground(3);
          image->windowing(32, 255-32);
-         //image->save();
       }
    }
-   saveAsPDF();
 
    qDebug("Time elapsed: %d ms", t.elapsed());
 }
 
-void ImagesList::saveAsPDF() {
-   QPdfWriter pdfWriter("test.pdf");
-   pdfWriter.setTitle("TestTitle");
-   pdfWriter.setCreator("DocumentADC");
+void ImagesList::saveAsImages(QString const & dir, QString const & suffix) {
+   foreach (Image * image, list) {
+      if (image->getChecked()) {
+         image->save(dir, suffix);
+      }
+   }
+}
+
+void ImagesList::saveAsPDF(QString const & filename) {
+   QPdfWriter pdfWriter(filename);
+   pdfWriter.setTitle(filename.mid(filename.lastIndexOf('/')+1, filename.lastIndexOf('.')-filename.lastIndexOf('/')-1));
+   pdfWriter.setCreator("Document ADC");
    pdfWriter.setPageSize(QPageSize(QPageSize::A4));
    pdfWriter.setPageMargins(QMarginsF(0.0, 0.0, 0.0, 0.0));
    pdfWriter.setResolution(300);

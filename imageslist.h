@@ -17,7 +17,8 @@ public:
    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
    bool setData(QModelIndex const & index, QVariant const & value, int role = Qt::EditRole);
    void loadImages(QStringList const & filenames);
-   void saveAsPDF(); ///< @todo add filename
+   void saveAsImages(QString const & dir, QString const & suffix);
+   void saveAsPDF(QString const & filename);
 
 public slots:
    void clear();

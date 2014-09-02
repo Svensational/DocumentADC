@@ -13,11 +13,13 @@ TEMPLATE = app
 SOURCES += main.cpp \
            mainwindow.cpp \
            image.cpp \
-           imageslist.cpp
+           imageslist.cpp \
+           savedialog.cpp
 
 HEADERS += mainwindow.h \
            image.h \
-           imageslist.h
+           imageslist.h \
+           savedialog.h
 
 OTHER_FILES += .gitignore \
                LICENSE \

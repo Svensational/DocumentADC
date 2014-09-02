@@ -8,9 +8,10 @@
 #include <QMenuBar>
 #include <QSplitter>
 #include "imageslist.h"
+#include "savedialog.h"
 
 MainWindow::MainWindow(QWidget * parent) :
-   QMainWindow(parent)
+   QMainWindow(parent), saveDialog(new SaveDialog(this))
 {
    setWindowTitle(tr("Document ADC"));
 
@@ -39,8 +40,18 @@ void MainWindow::createActions() {
            imagesList, &ImagesList::clear);
 
    runAction = new QAction(tr("&Run"), this);
+   runAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_R));
    connect(runAction, &QAction::triggered,
            imagesList, &ImagesList::run);
+
+   saveImagesAction = new QAction(tr("Save as images"), this);
+   connect(saveImagesAction, &QAction::triggered,
+           this, &MainWindow::saveAsImages);
+
+   savePDFAction = new QAction(tr("Save as PDF"), this);
+   savePDFAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+   connect(savePDFAction, &QAction::triggered,
+           this, &MainWindow::saveAsPDF);
 
    quitAction = new QAction(tr("&Quit"), this);
    quitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
@@ -64,6 +75,9 @@ void MainWindow::createMenues() {
    filesMenu->addSeparator();
    filesMenu->addAction(runAction);
    filesMenu->addSeparator();
+   filesMenu->addAction(saveImagesAction);
+   filesMenu->addAction(savePDFAction);
+   filesMenu->addSeparator();
    filesMenu->addAction(quitAction);
 }
 
@@ -76,10 +90,27 @@ void MainWindow::loadImages() {
    filter[filter.length()-1] = ')';
 
    QStringList files = QFileDialog::getOpenFileNames(this,
-                                                     "Select one or more images to open",
+                                                     tr("Select one or more images to open"),
                                                      QString(),
                                                      filter);
    if (!files.isEmpty()) {
       imagesList->loadImages(files);
+   }
+}
+
+void MainWindow::saveAsImages() {
+   if (saveDialog->exec()) {
+      imagesList->saveAsImages(saveDialog->getDir(),
+                               saveDialog->getSuffix());
+   }
+}
+
+void MainWindow::saveAsPDF() {
+   QString filename = QFileDialog::getSaveFileName(this,
+                                                   "Save as PDF",
+                                                   QString(),
+                                                   "PDF (*.pdf)");
+   if (!filename.isEmpty()) {
+      imagesList->saveAsPDF(filename);
    }
 }

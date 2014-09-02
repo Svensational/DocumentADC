@@ -175,10 +175,10 @@ void Image::removeBackgroundGray2MT(QPair<ScanLine, QPair<ushort, ushort>> & dat
    }
 }
 
-void Image::save() {
+void Image::save(const QString & dir, const QString & suffix) {
    ensureTouchedExistence();
 
-   touched->save(name+".png");
+   touched->save(dir+'/'+name+'.'+suffix);
 }
 
 void Image::setChecked(Qt::CheckState checkState) {

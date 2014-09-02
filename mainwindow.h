@@ -5,6 +5,7 @@
 
 class QListView;
 class ImagesList;
+class SaveDialog;
 
 class MainWindow : public QMainWindow {
 
@@ -18,15 +19,22 @@ private:
    QAction * loadAction;
    QAction * clearAction;
    QAction * runAction;
+   QAction * saveImagesAction;
+   QAction * savePDFAction;
    QAction * quitAction;
    QWidget * listWidget;
    QListView * imagesListView;
    ImagesList * imagesList;
+   SaveDialog * saveDialog;
 
    void createActions();
    void createMenues();
    void createListWidget();
+
+private slots:
    void loadImages();
+   void saveAsImages();
+   void saveAsPDF();
 };
 
 #endif // MAINWINDOW_H
