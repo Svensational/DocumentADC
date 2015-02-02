@@ -170,6 +170,13 @@ void Image::removeBackgroundGray2MT(QPair<ScanLine, QPair<ushort, ushort>> & dat
             max = qMax(max, *(data.first.in+(y+n)*bpl));
          }
       }
+      //double alpha = (max - *(data.first.out+y*bpl))/255.0;
+      //max = (1.0-alpha) * *(data.first.out+y*bpl) + alpha * max;
+
+      /*if (max - *(data.first.out+y*bpl) < 8) {
+         max = *(data.first.out+y*bpl);
+      }*/
+
       // divide original data by the background value
       *(data.first.out+y*bpl) /= max/255.0;
    }
